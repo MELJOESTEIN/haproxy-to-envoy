@@ -1,0 +1,82 @@
+admin:
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: 9901
+static_resources:
+  clusters:
+  - lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: http_back
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: 127.0.0.1
+                port_value: 8080
+        - endpoint:
+            address:
+              socket_address:
+                address: 127.0.0.1
+                port_value: 8081
+    name: http_back
+    type: STRICT_DNS
+  - lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: https_back
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: 127.0.0.1
+                port_value: 4443
+        - endpoint:
+            address:
+              socket_address:
+                address: 127.0.0.1
+                port_value: 4444
+    name: https_back
+    type: STRICT_DNS
+  listeners:
+  - address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: 80
+    filter_chains:
+    - filters:
+      - name: envoy.filters.network.http_connection_manager
+        typed_config:
+          '@type': type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+          http_filters:
+          - name: envoy.filters.http.router
+          route_config:
+            name: http_front_route
+            virtual_hosts:
+            - domains:
+              - '*'
+              name: http_front_vhost
+              routes: []
+          stat_prefix: http_front
+    name: http_front
+  - address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: 443
+    filter_chains:
+    - filters:
+      - name: envoy.filters.network.http_connection_manager
+        typed_config:
+          '@type': type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+          http_filters:
+          - name: envoy.filters.http.router
+          route_config:
+            name: https_front_route
+            virtual_hosts:
+            - domains:
+              - '*'
+              name: https_front_vhost
+              routes: []
+          stat_prefix: https_front
+    name: https_front
