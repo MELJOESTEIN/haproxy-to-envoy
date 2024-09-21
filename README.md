@@ -141,7 +141,7 @@ Please ensure your code adheres to the existing style to maintain consistency.
 
 ## License
 
-[Insert your chosen license here, e.g., MIT, GPL, etc.]
+[chosen license here, e.g., MIT, GPL, etc.]
 
 ## Acknowledgements
 
